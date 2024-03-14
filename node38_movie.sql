@@ -14,13 +14,13 @@ CREATE TABLE Phim(
 	hot BOOLEAN,
 	dang_chieu BOOLEAN,
 	sap_chieu BOOLEAN
-)
+);
 
 INSERT INTO Phim (ten_phim, trailer, hinh_anh, mo_ta, ngay_khoi_chieu, danh_gia, hot, dang_chieu, sap_chieu) VALUES
 ('Avatar', 'https://www.youtube.com/watch?v=5PSNL1qE6VY', 'avatar.jpg', 'Một nhà thám hiểm tham gia vào một cuộc hành trình đến một hành tinh xa xôi để tìm nguồn tài nguyên quý hiếm.', '2009-12-18', 9, TRUE, TRUE, TRUE),
 ('Titanic', 'https://www.youtube.com/watch?v=zCy5WQ9S4c0', 'titanic.jpg', 'Câu chuyện tình yêu giữa Jack và Rose trên tàu Titanic, một trong những thảm họa hàng hải lớn nhất trong lịch sử.', '1997-12-19', 8, FALSE, TRUE, FALSE),
 ('Jurassic Park', 'https://www.youtube.com/watch?v=QWBKEmWWL38', 'jurassic_park.jpg', 'Một công viên chứa các loài khủng long được tái tạo từ ADN và sự kiểm soát của chúng bị mất.', '1993-06-11', 8, TRUE, FALSE, TRUE),
-('Harry Potter and the Philosopher\'s Stone', 'https://www.youtube.com/watch?v=PbdM1db3JbY', 'harry_potter_1.jpg', 'Harry Potter khám phá thế giới phép thuật và tìm hiểu về quá khứ của mình.', '2001-11-16', 8, TRUE, TRUE, FALSE),
+('Harry Potter and the Stone of Philosopher', 'https://www.youtube.com/watch?v=PbdM1db3JbY', 'harry_potter_1.jpg', 'Harry Potter khám phá thế giới phép thuật và tìm hiểu về quá khứ của mình.', '2001-11-16', 8, TRUE, TRUE, FALSE),
 ('The Lord of the Rings: The Fellowship of the Ring', 'https://www.youtube.com/watch?v=V75dMMIW2B4', 'lotr_fellowship.jpg', 'Frodo và bạn bè của mình bắt đầu cuộc hành trình để tiêu diệt một chiếc nhẫn ma thuật.', '2001-12-19', 9, FALSE, FALSE, TRUE),
 ('The Shawshank Redemption', 'https://www.youtube.com/watch?v=6hB3S9bIaco', 'shawshank_redemption.jpg', 'Cuộc sống của những tù nhân trong nhà tù Shawshank và sự cố gắng của họ để tìm kiếm tự do.', '1994-10-14', 9, TRUE, FALSE, FALSE),
 ('Forrest Gump', 'https://www.youtube.com/watch?v=uPIEn0M8su0', 'forrest_gump.jpg', 'Forrest Gump, một chàng trai có IQ thấp nhưng trải qua nhiều sự kiện lịch sử ở Mỹ.', '1994-07-06', 8, FALSE, TRUE, TRUE),
@@ -48,7 +48,7 @@ CREATE TABLE Banner(
 	ma_phim INT,
 	FOREIGN KEY (ma_phim) REFERENCES Phim(ma_phim),
 	hinh_anh VARCHAR(250)
-)
+);
 
 INSERT INTO Banner (ma_phim, hinh_anh) VALUES
 (1, 'avatar_banner.jpg'),
@@ -77,7 +77,7 @@ CREATE TABLE HeThongRap(
 	ma_he_thong_rap INT PRIMARY KEY AUTO_INCREMENT,
 	ten_he_thong_rap VARCHAR(250),
 	logo VARCHAR(250)
-)
+);
 
 INSERT INTO HeThongRap (ten_he_thong_rap, logo) VALUES
 ('CGV Cinemas', 'cgv_logo.jpg'),
@@ -108,7 +108,7 @@ CREATE TABLE CumRap(
 	dia_chi VARCHAR(255),
 	ma_he_thong_rap INT,
 	FOREIGN KEY (ma_he_thong_rap) REFERENCES HeThongRap(ma_he_thong_rap)
-)
+);
 
 INSERT INTO CumRap (ten_cum_rap, dia_chi, ma_he_thong_rap) VALUES
 ('CGV Aeon Mall Hà Đông', 'Tầng 4, Aeon Mall Hà Đông, đường Lê Trọng Tấn, P. Dương Nội, Q. Hà Đông, Hà Nội', 1),
@@ -138,7 +138,7 @@ CREATE TABLE RapPhim(
 	ten_rap VARCHAR(250),
 	ma_cum_rap INT,
 	FOREIGN KEY (ma_cum_rap) REFERENCES CumRap(ma_cum_rap)
-)
+);
 
 INSERT INTO RapPhim (ten_rap, ma_cum_rap) VALUES
 ('Rạp 1', 1),
@@ -170,7 +170,7 @@ CREATE TABLE NguoiDung(
 	so_dt VARCHAR(10),
 	mat_khau VARCHAR(250),
 	loai_nguoi_dung VARCHAR(250)
-)
+);
 
 INSERT INTO NguoiDung (ho_ten, email, so_dt, mat_khau, loai_nguoi_dung) VALUES
 ('Admin 1', 'admin1@example.com', '0123456789', 'hashed_admin1_password', 'admin'),
@@ -204,7 +204,7 @@ CREATE TABLE LichChieu(
 	FOREIGN KEY (ma_phim) REFERENCES Phim(ma_phim),
 	ngay_gio_chieu DATETIME,
 	gia_ve INT
-)
+);
 
 INSERT INTO LichChieu (ma_rap, ma_phim, ngay_gio_chieu, gia_ve) VALUES
 (1, 1, '2024-03-07 10:00:00', 80000),
@@ -235,7 +235,7 @@ CREATE TABLE Ghe(
 	loai_ghe VARCHAR(200),
 	ma_rap INT,
 	FOREIGN KEY (ma_rap) REFERENCES RapPhim(ma_rap)
-)
+);
 
 INSERT INTO Ghe (ten_ghe, loai_ghe, ma_rap) VALUES
 ('A1', 'Ghế thường', 6),
@@ -268,7 +268,7 @@ CREATE TABLE DatVe (
     FOREIGN KEY (tai_khoan) REFERENCES NguoiDung(tai_khoan),
     FOREIGN KEY (ma_lich_chieu) REFERENCES LichChieu(ma_lich_chieu),
     FOREIGN KEY (ma_ghe) REFERENCES Ghe(ma_ghe)
-)
+);
 
 INSERT INTO DatVe (tai_khoan, ma_lich_chieu, ma_ghe) VALUES
 (1, 1, 1),
@@ -291,12 +291,3 @@ INSERT INTO DatVe (tai_khoan, ma_lich_chieu, ma_ghe) VALUES
 (8, 18, 16),
 (9, 19, 18),
 (10, 20, 20);
-
-
-
-
-
-
-
-
-

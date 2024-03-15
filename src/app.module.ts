@@ -15,8 +15,9 @@ import { QuanLyRapModule } from './quan-ly-rap/quan-ly-rap.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    QuanLyPhimModule,
+    QuanLyRapModule,
   ],
-  imports: [QuanLyPhimModule, QuanLyRapModule],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],
 })

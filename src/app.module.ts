@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { JwtStrategy } from './strategy/jwt.strategy';
+import { ManageTicketBookedModule } from './manage-ticket-booked/manage-ticket-booked.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ManageTicketBookedModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],

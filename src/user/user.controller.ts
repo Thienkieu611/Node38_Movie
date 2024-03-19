@@ -48,7 +48,7 @@ export class UserController {
     return this.userService.findUser(keyword);
   }
 
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @Post('get-detail')
   getDetail(@Query('id') id: string) {
     return this.userService.getDetail(+id);

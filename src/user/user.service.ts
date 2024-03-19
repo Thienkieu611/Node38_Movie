@@ -21,28 +21,45 @@ export class UserService {
   }
 
   async findOne(id: number): Promise<NguoiDung> {
-    const user = await this.prisma.nguoiDung.findUnique({
-      where: {
-        tai_khoan: id,
-      },
-    });
-    return user;
+    try {
+      const user = await this.prisma.nguoiDung.findUnique({
+        where: {
+          tai_khoan: id,
+        },
+      });
+      return user;
+    } catch (error) {
+      return error;
+    }
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const upadateUser = await this.prisma.nguoiDung.update({
-      where: {
-        tai_khoan: id,
-      },
-      data: {
-        email: updateUserDto.email,
-        mat_khau: updateUserDto.password,
-        ho_ten: updateUserDto.name,
-        loai_nguoi_dung: updateUserDto.role,
-        so_dt: updateUserDto.phone,
-      },
-    });
-    return upadateUser;
+    try {
+      const checkEmail = await this.prisma.nguoiDung.findFirst({
+        where: {
+          email: updateUserDto.email,
+        },
+      });
+      if (checkEmail) {
+        return 'Email is exist';
+      } else {
+        const createUser = await this.prisma.nguoiDung.update({
+          where: {
+            tai_khoan: id,
+          },
+          data: {
+            email: updateUserDto.email,
+            mat_khau: updateUserDto.password,
+            ho_ten: updateUserDto.name,
+            loai_nguoi_dung: updateUserDto.role,
+            so_dt: updateUserDto.phone,
+          },
+        });
+        return createUser;
+      }
+    } catch (error) {
+      return error;
+    }
   }
 
   async remove(id: number): Promise<any> {
@@ -68,23 +85,30 @@ export class UserService {
   }
 
   async findUser(keyword: string) {
-    const user = await this.prisma.nguoiDung.findMany({
-      where: {
-        ho_ten: {
-          contains: keyword,
+    try {
+      const user = await this.prisma.nguoiDung.findMany({
+        where: {
+          ho_ten: {
+            contains: keyword,
+          },
         },
-      },
-    });
-    return user;
+      });
+      return user;
+    } catch (error) {
+      return error;
+    }
   }
 
-  async getDetail(id:number): Promise<NguoiDung> {
-    
-    const user = await this.prisma.nguoiDung.findUnique({
-      where: {
-        tai_khoan: id,
-      },
-    });
-    return user;
+  async getDetail(id: number): Promise<NguoiDung> {
+    try {
+      const user = await this.prisma.nguoiDung.findUnique({
+        where: {
+          tai_khoan: id,
+        },
+      });
+      return user;
+    } catch (error) {
+      return error;
+    }
   }
 }

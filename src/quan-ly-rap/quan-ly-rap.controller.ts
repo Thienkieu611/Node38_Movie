@@ -1,21 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-  BadRequestException,
-  ParseIntPipe,
-} from '@nestjs/common';
+import { Controller, Get, Query, BadRequestException } from '@nestjs/common';
 import { QuanLyRapService } from './quan-ly-rap.service';
-import { CreateQuanLyRapDto } from './dto/create-quan-ly-rap.dto';
-import { UpdateQuanLyRapDto } from './dto/update-quan-ly-rap.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { HeThongRap } from '@prisma/client';
-import { ThongTinRap } from './dto/thong-tin-rap.dto';
 
 @ApiTags('QuanLyRap')
 @Controller('api/QuanLyRap')
@@ -27,7 +13,6 @@ export class QuanLyRapController {
   async layThongTinHeThongRap(
     @Query('maHeThongRap') maHeThongRap: string,
   ): Promise<HeThongRap[]> {
-    // const { maHeThongRap } = searchKey;
     let parsedMaHeThongRap: number | undefined;
 
     if (maHeThongRap !== undefined && maHeThongRap.trim() !== '') {

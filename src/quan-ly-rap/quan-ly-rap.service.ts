@@ -1,9 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateQuanLyRapDto } from './dto/create-quan-ly-rap.dto';
-import { UpdateQuanLyRapDto } from './dto/update-quan-ly-rap.dto';
-import { CumRap, HeThongRap, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { createResponse } from 'src/utils/config';
-import { contains } from 'class-validator';
+
 @Injectable()
 export class QuanLyRapService {
   prisma = new PrismaClient();
@@ -79,7 +77,9 @@ export class QuanLyRapService {
       return errorPayload;
     }
   }
-  async LayThongTinLichChieuHeThongRap(maHeThongRap: number): Promise<any> {
+  async LayThongTinLichChieuHeThongRap(
+    maHeThongRap: number | undefined,
+  ): Promise<any> {
     try {
       let condition: any = {};
       if (maHeThongRap !== undefined) {
@@ -91,22 +91,49 @@ export class QuanLyRapService {
         include: {
           RapPhim: {
             include: {
-              LichChieu: true,
+              LichChieu: {
+                include: {
+                  Phim: true,
+                },
+              },
             },
           },
+          HeThongRap: true,
         },
       });
+
+      const heThongRapInfo =
+        cumRapData.length > 0
+          ? {
+              maHeThongRap: cumRapData[0].HeThongRap.ma_he_thong_rap,
+              tenHeThongRap: cumRapData[0].HeThongRap.ten_he_thong_rap,
+              logo: cumRapData[0].HeThongRap.logo,
+            }
+          : {};
+
       const content = cumRapData.map((cumRap) => ({
         lstCumRap: cumRap.RapPhim.map((phim) => ({
           danhSachPhim: phim.LichChieu.map((lichChieu) => ({
-            maLichChieu: lichChieu.ma_lich_chieu,
-            maRap: lichChieu.ma_rap,
-
-            ngayChieuGioChieu: lichChieu.ngay_gio_chieu,
-            giaVe: lichChieu.gia_ve,
+            lstLichChieuTheoPhim: phim.LichChieu.map((lichChieuTheoPhim) => ({
+              maLichChieu: lichChieuTheoPhim.ma_lich_chieu,
+              maRap: lichChieuTheoPhim.ma_rap,
+              tenRap: phim.ten_rap,
+              ngayChieuGioChieu: lichChieuTheoPhim.ngay_gio_chieu,
+              giaVe: lichChieuTheoPhim.gia_ve,
+            })),
+            maPhim: lichChieu.Phim.ma_phim,
+            tenPhim: lichChieu.Phim.ten_phim,
+            hinhAnh: lichChieu.Phim.hinh_anh,
+            hot: lichChieu.Phim.hot,
+            dangChieu: lichChieu.Phim.dang_chieu,
+            sapChieu: lichChieu.Phim.sap_chieu,
           })),
+          maCumRap: cumRap.ma_cum_rap,
+          tenCumRap: cumRap.ten_cum_rap,
+          diaChi: cumRap.dia_chi,
         })),
       }));
+
       const payload = createResponse(200, 'Xử lý thành công', content);
       return payload;
     } catch (error) {}

@@ -27,8 +27,8 @@ export class AuthService {
         };
         // token jwt, dùng khi tạo mã hóa jwt
         let token = this.jwtService.signAsync(
-          { data },
-          { secret: 'SECRET_KEY' },
+          data ,
+          { expiresIn: "10m", secret: 'SECRET_KEY' },
         );
         const saltOrRounds = 10;
         const password = loginUser.password;

@@ -6,12 +6,12 @@ import {
   Query,
   Put,
   UseGuards,
+  Post,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 
-@UseGuards(AuthGuard('jwt'))
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -31,18 +31,26 @@ export class UserController {
     return this.userService.findOne(+id);
   }
 
+  @UseGuards(AuthGuard('jwt')) //Dùng để khóa api (muốn khóa api nào thì để trên code api đó)
   @Put('update')
   update(@Query('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete('delete')
   remove(@Query('id') id: string) {
     return this.userService.remove(+id);
   }
 
-  @Get('find')
+  @Get('search')
   findUser(@Query('keyword') keyword: string) {
     return this.userService.findUser(keyword);
+  }
+
+  // @UseGuards(AuthGuard('jwt'))
+  @Post('get-detail')
+  getDetail(@Query('id') id: string) {
+    return this.userService.getDetail(+id);
   }
 }

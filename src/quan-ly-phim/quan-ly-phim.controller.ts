@@ -12,6 +12,8 @@ import {
   Headers,
   UseGuards,
   Header,
+  Put,
+  Req,
 } from '@nestjs/common';
 import { QuanLyPhimService } from './quan-ly-phim.service';
 import { CreateQuanLyPhimDto } from './dto/create-quan-ly-phim.dto';
@@ -34,6 +36,7 @@ import { createResponse, decodedToken } from 'src/utils/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { AuthGuard } from '@nestjs/passport';
+import { UpdatePhimDto } from './dto/update-phim.dto';
 
 @ApiTags('QuanLyPhim')
 @Controller('api/QuanLyPhim')
@@ -171,74 +174,82 @@ export class QuanLyPhimController {
     return await this.quanLyPhimService.quanLyPhim(file, tenPhim);
   }
 
-  @Post('ThemPhimUploadHinh')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: process.cwd() + '/public/img',
-        filename: (req, file, callback) => {
-          callback(null, new Date().getTime() + `${file.originalname}`);
-        },
-      }),
-    }),
-  )
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: 'Dữ liệu của file',
-    required: true,
-    schema: {
-      type: 'object',
+  // @Post('ThemPhimUploadHinh')
+  // @UseInterceptors(
+  //   FileInterceptor('file', {
+  //     storage: diskStorage({
+  //       destination: process.cwd() + '/public/img',
+  //       filename: (req, file, callback) => {
+  //         callback(null, new Date().getTime() + `${file.originalname}`);
+  //       },
+  //     }),
+  //   }),
+  // )
+  // @ApiConsumes('multipart/form-data')
+  // @ApiBody({
+  //   description: 'Dữ liệu của file',
+  //   required: true,
+  //   schema: {
+  //     type: 'object',
 
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-          description: 'File to upload',
-        },
-        maPhim: {
-          type: 'number',
-          description: 'Mã phim',
-        },
-      },
-    },
-  })
-  async themPhimUploadHinh(
-    @UploadedFile('file') file: Express.Multer.File,
-    @Body('maPhim') maPhim: number,
-  ): Promise<any> {
-    console.log(maPhim);
-    return await this.quanLyPhimService.themPhimUploadHinh(
-      file,
-      Number(maPhim),
+  //     properties: {
+  //       file: {
+  //         type: 'string',
+  //         format: 'binary',
+  //         description: 'File to upload',
+  //       },
+  //       maPhim: {
+  //         type: 'number',
+  //         description: 'Mã phim',
+  //       },
+  //     },
+  //   },
+  // })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @Put('CapNhatPhimUpload')
+  async capNhatPhimUpload(
+    @Req() req: Request,
+    @Query('maPhim') maPhim: number,
+    @Body() updatePhimDto: UpdatePhimDto,
+  ) {
+    const authorizationToken = (req.headers as any).authorization;
+    const token = authorizationToken.split('Bearer ')[1];
+    const userInfo = await decodedToken(token);
+    if (userInfo.role !== 'admin') {
+      return createResponse(
+        400,
+        'Unauthorized',
+        'Chỉ có admin mới có thể update !',
+      );
+    }
+    return await this.quanLyPhimService.capNhatPhimUpload(
+      +maPhim,
+      updatePhimDto,
     );
   }
-  @Post('CapNhatPhimUpload')
-  async capNhatPhimUpload() {
-    return await this.quanLyPhimService.capNhatPhimUpload();
-  }
 
-  // @ApiBearerAuth()
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Delete('XoaPhim')
   @ApiQuery({ name: 'maPhim', type: 'number' })
   async xoaPhim(
     @Query('maPhim') maPhim: number,
-    @Headers('Authorization') authorizationToken: string,
+    @Req() req: Request,
   ): Promise<any> {
-    //   if (!authorizationToken) {
-    //     return createResponse(401, 'Unauthorized', 'Bạn không có quyền truy cập');
-    //   }
     try {
-      //     const userInfo = await decodedToken(authorizationToken);
-      //     console.log(userInfo);
-      //     if (userInfo.role !== 'admin') {
-      //       return createResponse(
-      //         401,
-      //         'Unauthorized',
-      //         'Bạn không có quyền xoá phim',
-      //       );
+      const authorizationToken = (req.headers as any).authorization;
+      const token = authorizationToken.split('Bearer ')[1];
 
-      // }
+      const userInfo = await decodedToken(token);
+      if (userInfo.role !== 'admin') {
+        return createResponse(
+          400,
+          'Unauthorized',
+          'Chỉ có admin mới có thể xoá !',
+        );
+      }
+
       return await this.quanLyPhimService.xoaPhim(Number(maPhim));
     } catch (error) {
       return createResponse(401, 'Unauthorized', 'Token không hợp lệ');

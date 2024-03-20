@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { UserLogin } from 'src/user/entities/user.entity';
 import { PrismaClient } from '@prisma/client';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { UserLoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
   constructor(private jwtService: JwtService) {}
   prisma = new PrismaClient();
 
-  async login(loginUser: UserLogin) {
+  async login(loginUser: UserLoginDto): Promise<any> {
     try {
       const user = await this.prisma.nguoiDung.findFirst({
         where: {
@@ -26,10 +26,10 @@ export class AuthService {
           role: user.loai_nguoi_dung,
         };
         // token jwt, dùng khi tạo mã hóa jwt
-        let token = this.jwtService.signAsync(
-          data ,
-          { expiresIn: "10m", secret: 'SECRET_KEY' },
-        );
+        let token = this.jwtService.signAsync(data, {
+          expiresIn: '10m',
+          secret: 'SECRET_KEY',
+        });
         const saltOrRounds = 10;
         const password = loginUser.password;
         const hash = await bcrypt.hash(password, saltOrRounds);

@@ -9,6 +9,7 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
+  Headers,
 } from '@nestjs/common';
 import { QuanLyPhimService } from './quan-ly-phim.service';
 import { CreateQuanLyPhimDto } from './dto/create-quan-ly-phim.dto';
@@ -132,7 +133,7 @@ export class QuanLyPhimController {
       storage: diskStorage({
         destination: process.cwd() + '/public/img',
         filename: (req, file, callback) => {
-          callback(null, new Date().getTime + `${file.originalname}`);
+          callback(null, new Date().getTime() + `${file.originalname}`);
         },
       }),
     }),
@@ -141,9 +142,9 @@ export class QuanLyPhimController {
   @ApiBody({
     description: 'Dữ liệu của file',
     required: true,
-
     schema: {
       type: 'object',
+
       properties: {
         file: {
           type: 'string',
@@ -159,8 +160,30 @@ export class QuanLyPhimController {
   })
   async quanLyPhim(
     @UploadedFile('file') file: Express.Multer.File,
+    @Body('tenPhim') tenPhim: string,
   ): Promise<any> {
-    return await this.quanLyPhimService.quanLyPhim(file);
+    return await this.quanLyPhimService.quanLyPhim(file, tenPhim);
+  }
+
+  @Post('ThemPhimUploadHinh')
+  async themPhimUploadHinh() {
+    return await this.quanLyPhimService.themPhimUploadHinh();
+  }
+  @Post('CapNhatPhimUpload')
+  async capNhatPhimUpload() {
+    return await this.quanLyPhimService.capNhatPhimUpload();
+  }
+
+  @Delete('XoaPhim')
+  @ApiQuery({ name: 'maPhim', type: 'number' })
+  async xoaPhim(
+    @Query('maPhim') maPhim: number,
+    // @Headers('Authorization') authorizationToken: string,
+  ): Promise<any> {
+    // if (!authorizationToken) {
+    //   return createResponse(401, 'Unauthorized', 'Bạn không có quyền truy cập');
+    // }
+    return await this.quanLyPhimService.xoaPhim(Number(maPhim));
   }
 
   @Get('LayThongTinPhim')

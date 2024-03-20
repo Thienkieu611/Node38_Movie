@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { NguoiDung, PrismaClient } from '@prisma/client';
-import { createResponse } from 'src/utils/config';
+import { createResponse, decodedToken } from 'src/utils/config';
 
 @Injectable()
 export class UserService {
@@ -50,7 +50,7 @@ export class UserService {
     }
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto, req: any) {
     try {
       const checkEmail = await this.prisma.nguoiDung.findFirst({
         where: {
@@ -85,15 +85,21 @@ export class UserService {
     }
   }
 
-  async remove(id: number): Promise<any> {
+  async remove(id: number, req: any): Promise<any> {
     try {
       const deleteUser = await this.prisma.nguoiDung.delete({
         where: {
           tai_khoan: id,
         },
       });
-      const payload = createResponse(200, 'Xử lý thành công', deleteUser);
-      return payload;
+      const dataToken = req.user;
+      if (dataToken.role == 'admin') {
+        const payload = createResponse(200, 'Xử lý thành công', deleteUser);
+        return payload;
+      } else {
+        const payload = createResponse(403, 'Không có quyền truy cập', null);
+        return payload;
+      }
     } catch (error) {
       const errorPayload = createResponse(
         500,
@@ -140,14 +146,84 @@ export class UserService {
     }
   }
 
-  async getDetail(id: number): Promise<NguoiDung> {
+  async getDetail(id: number, req: any): Promise<any> {
     try {
       const user = await this.prisma.nguoiDung.findUnique({
         where: {
           tai_khoan: id,
         },
       });
-      const payload = createResponse(200, 'Xử lý thành công', user);
+      const dataToken = req.user;
+      if (dataToken.id == user.tai_khoan) {
+        const payload = createResponse(200, 'Xử lý thành công', user);
+        return payload;
+      } else {
+        const payload = createResponse(403, 'Không có quyền truy cập', null);
+        return payload;
+      }
+    } catch (error) {
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error,
+      );
+      return errorPayload;
+    }
+  }
+
+  async timKiemNguoiDungPhanTrang(
+    tenNguoiDung: string,
+    skip: number,
+    soPhanTuTrenTrang: number,
+  ): Promise<NguoiDung[]> {
+    try {
+      const tenNguoiDungLowerCase = tenNguoiDung
+        ? tenNguoiDung.toLowerCase()
+        : '';
+
+      const danhSachNguoiDung = await this.prisma.nguoiDung.findMany({
+        where: {
+          ho_ten: {
+            contains: tenNguoiDungLowerCase,
+          },
+        },
+        skip,
+        take: soPhanTuTrenTrang,
+      });
+
+      const payload = createResponse(
+        200,
+        'Xử lý thành công',
+        danhSachNguoiDung,
+      );
+
+      return payload;
+    } catch (error) {
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error,
+      );
+      return errorPayload;
+    }
+  }
+
+  async layDanhSachNguoiDungPhanTrang(
+    skip: number,
+    soPhanTuTrenTrang: number,
+  ): Promise<NguoiDung[]> {
+    try {
+      const danhSachNguoiDung = await this.prisma.nguoiDung.findMany({
+        skip,
+        take: soPhanTuTrenTrang,
+      });
+
+      const payload = createResponse(
+        200,
+        'Xử lý thành công',
+        danhSachNguoiDung,
+      );
+
       return payload;
     } catch (error) {
       const errorPayload = createResponse(

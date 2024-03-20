@@ -10,7 +10,7 @@ import {
 import { ManageTicketBookedService } from './manage-ticket-booked.service';
 import { CreateShowtimeDto } from './dto/create-showtime.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+
 import { ApiBearerAuth, ApiProperty, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { authorize } from 'passport';
 import { DanhSachVeDat } from './dto/danh-sach-ve-dat.dto';

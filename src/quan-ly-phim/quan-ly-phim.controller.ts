@@ -14,6 +14,7 @@ import { UpdateQuanLyPhimDto } from './dto/update-quan-ly-phim.dto';
 import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Banner, Phim } from '@prisma/client';
 import { SearchFilmDto } from './dto/search-phim.dto';
+import { createResponse } from 'src/utils/config';
 
 @ApiTags('QuanLyPhim')
 @Controller('api/QuanLyPhim')
@@ -31,26 +32,30 @@ export class QuanLyPhimController {
   }
 
   @Get('LayDanhSachPhimPhanTrang')
-  @ApiParam({
+  @ApiQuery({
     name: 'soPhanTuTrenTrang',
     required: false,
     type: 'integer',
+    example: 10,
   })
-  @ApiParam({
+  @ApiQuery({
     name: 'soTrang',
     required: false,
     type: 'integer',
+    example: 1,
   })
   @ApiQuery({ name: 'tenPhim', required: false, type: 'string' })
   async layDanhSachPhimPhanTrang(
-    @Query() searchParams: SearchFilmDto,
+    @Query('tenPhim') tenPhim: string,
+    @Query('soTrang') soTrang: number,
+    @Query('soPhanTuTrenTrang') soPhanTuTrenTrang: number,
   ): Promise<Phim[]> {
-    const { soTrang, tenPhim, soPhanTuTrenTrang } = searchParams;
-    const skip = (soTrang - 1) * soPhanTuTrenTrang;
+    const skip = (Number(soTrang) - 1) * Number(soPhanTuTrenTrang);
+
     return await this.quanLyPhimService.layDanhSachPhimPhanTrang(
       tenPhim,
-      skip,
-      soPhanTuTrenTrang,
+      Number(skip),
+      Number(soPhanTuTrenTrang),
     );
   }
 
@@ -79,16 +84,39 @@ export class QuanLyPhimController {
   })
   @ApiQuery({ name: 'tenPhim', required: false, type: 'string' })
   async layDanhSachPhimTheoNgay(
-    @Query() searchParams: SearchFilmDto,
+    @Query('tenPhim') tenPhim: string,
+    @Query('soTrang') soTrang: number,
+    @Query('soPhanTuTrenTrang') soPhanTuTrenTrang: number,
+    @Query('tuNgay') tuNgay: string,
+    @Query('denNgay') denNgay: string,
   ): Promise<Phim[]> {
-    return await this.quanLyPhimService.layDanhSachPhimTheoNgay(searchParams);
+    const skip = (Number(soTrang) - 1) * Number(soPhanTuTrenTrang);
+
+    // Kiểm tra tính hợp lệ của tuNgay và denNgay
+    const isValidDate = (dateString: string): boolean => {
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      return regex.test(dateString);
+    };
+
+    if (
+      (tuNgay && !isValidDate(tuNgay)) ||
+      (denNgay && !isValidDate(denNgay))
+    ) {
+      return createResponse(400, 'Yêu cầu không hợp lệ!', 'Ngày không hợp lệ ');
+    }
+
+    return await this.quanLyPhimService.layDanhSachPhimTheoNgay(
+      tenPhim,
+      Number(skip),
+      Number(soPhanTuTrenTrang),
+      tuNgay,
+      denNgay,
+    );
   }
 
   @Get('LayThongTinPhim')
   @ApiQuery({ name: 'maPhim', type: 'number' })
-  async layThongTinPhim(
-    @Query() searchParams: SearchFilmDto,
-  ): Promise<Phim | null> {
-    return await this.quanLyPhimService.layThongTinPhim(searchParams);
+  async layThongTinPhim(@Query('maPhim') maPhim: number): Promise<Phim | null> {
+    return await this.quanLyPhimService.layThongTinPhim(Number(maPhim));
   }
 }

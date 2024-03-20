@@ -64,7 +64,21 @@ export class QuanLyRapController {
     );
   }
   @Get('LayThongTinLichChieuPhim')
-  async layThongTinLichChieuPhim() {
-    return this.quanLyRapService.layThongTinLichChieuPhim();
+  @ApiQuery({ name: 'maPhim', required: true, type: 'number' })
+  async layThongTinLichChieuPhim(
+    @Query('maPhim') maPhim: string,
+  ): Promise<any> {
+    let parsedMaHeThongRap: number | undefined;
+
+    if (maPhim !== undefined && maPhim.trim() !== '') {
+      parsedMaHeThongRap = parseInt(maPhim, 10);
+      if (isNaN(parsedMaHeThongRap)) {
+        throw new BadRequestException('MaPhim must be a number');
+      }
+    }
+
+    return await this.quanLyRapService.layThongTinLichChieuPhim(
+      parsedMaHeThongRap,
+    );
   }
 }

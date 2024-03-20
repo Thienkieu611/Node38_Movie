@@ -80,21 +80,29 @@ export class QuanLyPhimService {
     }
   }
 
-  async layDanhSachPhimTheoNgay(searchParams: SearchFilmDto): Promise<Phim[]> {
+  async layDanhSachPhimTheoNgay(
+    tenPhim: string,
+    skip: number,
+    soPhanTuTrenTrang: number,
+    tuNgay: string,
+    denNgay: string,
+  ): Promise<Phim[]> {
     try {
-      const { soTrang, soPhanTuTrenTrang, tenPhim, tuNgay, denNgay } =
-        searchParams;
-      const skip = (soTrang - 1) * soPhanTuTrenTrang;
-
-      const phim = tenPhim.toLowerCase();
+      const tenPhimLowerCase = tenPhim ? tenPhim.toLowerCase() : '';
 
       const danhSachPhim = await this.prisma.phim.findMany({
         where: {
-          ten_phim: {
-            contains: phim,
-          },
+          AND: [
+            {
+              ten_phim: {
+                contains: tenPhimLowerCase,
+              },
+            },
+            tuNgay ? { ngay_khoi_chieu: { gte: new Date(tuNgay) } } : {},
+            denNgay ? { ngay_khoi_chieu: { lte: new Date(denNgay) } } : {},
+          ],
         },
-        skip: skip,
+        skip,
         take: soPhanTuTrenTrang,
       });
 
@@ -111,15 +119,20 @@ export class QuanLyPhimService {
     }
   }
 
-  async layThongTinPhim(searchParams: SearchFilmDto): Promise<Phim | null> {
+  async layThongTinPhim(maPhim: number): Promise<Phim | null> {
     try {
-      const { maPhim } = searchParams;
       const thongTinPhim = await this.prisma.phim.findFirst({
         where: { ma_phim: maPhim },
       });
-
-      //const payload = createResponse(200, 'Xử lý thành công', thongTinPhim);
-      return thongTinPhim;
+      if (!thongTinPhim) {
+        return createResponse(
+          400,
+          'Không tìm thấy tài nguyên',
+          'Mã phim không tồn tại',
+        );
+      }
+      const payload = createResponse(200, 'Xử lý thành công', thongTinPhim);
+      return payload;
     } catch (error) {}
   }
 }

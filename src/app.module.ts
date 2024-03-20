@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { ManageTicketBookedModule } from './manage-ticket-booked/manage-ticket-booked.module';
+import { QuanLyPhimModule } from './quan-ly-phim/quan-ly-phim.module';
+import { QuanLyRapModule } from './quan-ly-rap/quan-ly-rap.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { ManageTicketBookedModule } from './manage-ticket-booked/manage-ticket-b
       isGlobal: true,
     }),
     ManageTicketBookedModule,
+    QuanLyPhimModule,
+    QuanLyRapModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],

@@ -5,6 +5,7 @@ import { Banner, Phim, PrismaClient } from '@prisma/client';
 import { createResponse } from 'src/utils/config';
 import { SearchFilmDto } from './dto/search-phim.dto';
 import { contains } from 'class-validator';
+import { UpdatePhimDto } from './dto/update-phim.dto';
 
 @Injectable()
 export class QuanLyPhimService {
@@ -154,17 +155,14 @@ export class QuanLyPhimService {
       return errorPayload;
     }
   }
-  async themPhimUploadHinh(
-    file: Express.Multer.File,
-    maPhim: number,
-  ): Promise<any> {
+
+  async capNhatPhimUpload(maPhim: number, updatePhimDto: UpdatePhimDto) {
     try {
       const checkMaPhim = await this.prisma.phim.findFirst({
         where: {
           ma_phim: maPhim,
         },
       });
-
       if (!checkMaPhim) {
         return createResponse(
           400,
@@ -172,30 +170,23 @@ export class QuanLyPhimService {
           'Mã phim không tồn tại',
         );
       }
-      if (file.size > 1 * 1024 * 1024) {
-        return 'Dung lượng file không được vượt quá 1MB';
-      }
-      const allowedImageFormats = [
-        'image/jpeg',
-        'image/jpg',
-        'image/png',
-        'image/gif',
-      ];
-      if (!allowedImageFormats.includes(file.mimetype)) {
-        return 'File không phải là ảnh';
-      }
-      const imageUploadPhim = await this.prisma.phim.create({
+      const updatePhim = await this.prisma.phim.update({
+        where: {
+          ma_phim: maPhim,
+        },
         data: {
-          ma_phim: checkMaPhim.ma_phim,
-
-          hinh_anh: file.path,
+          ten_phim: updatePhimDto.ten_phim,
+          trailer: updatePhimDto.trailer,
+          hinh_anh: updatePhimDto.hinh_anh,
+          mo_ta: updatePhimDto.mo_ta,
+          ngay_khoi_chieu: updatePhimDto.ngay_khoi_chieu,
+          danh_gia: updatePhimDto.danh_gia,
+          hot: updatePhimDto.hot,
+          dang_chieu: updatePhimDto.dang_chieu,
+          sap_chieu: updatePhimDto.sap_chieu,
         },
       });
-      const payload = createResponse(
-        200,
-        'Thêm hình ảnh vào phim thành công',
-        imageUploadPhim,
-      );
+      const payload = createResponse(200, 'Xử lý thành công', updatePhim);
       return payload;
     } catch (error) {
       const errorPayload = createResponse(
@@ -206,30 +197,26 @@ export class QuanLyPhimService {
       return errorPayload;
     }
   }
-  async capNhatPhimUpload() {
-    return;
-  }
   async xoaPhim(maPhim: number): Promise<any> {
-    //   const checkMaPhim = await this.prisma.phim.findFirst({
-    //     where: {
-    //       ma_phim: maPhim,
-    //     },
-    //   });
-    //   if (!checkMaPhim) {
-    //     return createResponse(
-    //       400,
-    //       'Không tìm thấy tài nguyên',
-    //       'Mã phim không tồn tại',
-    //     );
-    //   }
-    //   await this.prisma.phim.delete({
-    //     where: {
-    //       ma_phim: maPhim,
-    //     },
-    //   });
-    //   const payload = createResponse(200, 'Xử lý thành công', 'Phim đã được xoá');
-    //   return payload;
-    return maPhim;
+    const checkMaPhim = await this.prisma.phim.findFirst({
+      where: {
+        ma_phim: maPhim,
+      },
+    });
+    if (!checkMaPhim) {
+      return createResponse(
+        400,
+        'Không tìm thấy tài nguyên',
+        'Mã phim không tồn tại',
+      );
+    }
+    await this.prisma.phim.delete({
+      where: {
+        ma_phim: maPhim,
+      },
+    });
+    const payload = createResponse(200, 'Xử lý thành công', 'Phim đã được xoá');
+    return payload;
   }
 
   async layThongTinPhim(maPhim: number): Promise<Phim | null> {

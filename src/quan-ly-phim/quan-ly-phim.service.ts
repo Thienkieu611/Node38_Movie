@@ -154,35 +154,82 @@ export class QuanLyPhimService {
       return errorPayload;
     }
   }
+  async themPhimUploadHinh(
+    file: Express.Multer.File,
+    maPhim: number,
+  ): Promise<any> {
+    try {
+      const checkMaPhim = await this.prisma.phim.findFirst({
+        where: {
+          ma_phim: maPhim,
+        },
+      });
 
-  async xoaPhim(maPhim: number): Promise<any> {
-    const checkMaPhim = await this.prisma.phim.findFirst({
-      where: {
-        ma_phim: maPhim,
-      },
-    });
+      if (!checkMaPhim) {
+        return createResponse(
+          400,
+          'Không tìm thấy tài nguyên',
+          'Mã phim không tồn tại',
+        );
+      }
+      if (file.size > 1 * 1024 * 1024) {
+        return 'Dung lượng file không được vượt quá 1MB';
+      }
+      const allowedImageFormats = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/gif',
+      ];
+      if (!allowedImageFormats.includes(file.mimetype)) {
+        return 'File không phải là ảnh';
+      }
+      const imageUploadPhim = await this.prisma.phim.create({
+        data: {
+          ma_phim: checkMaPhim.ma_phim,
 
-    if (!checkMaPhim) {
-      return createResponse(
-        400,
-        'Không tìm thấy tài nguyên',
-        'Mã phim không tồn tại',
+          hinh_anh: file.path,
+        },
+      });
+      const payload = createResponse(
+        200,
+        'Thêm hình ảnh vào phim thành công',
+        imageUploadPhim,
       );
+      return payload;
+    } catch (error) {
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error,
+      );
+      return errorPayload;
     }
-    await this.prisma.phim.delete({
-      where: {
-        ma_phim: maPhim,
-      },
-    });
-    const payload = createResponse(200, 'Xử lý thành công', 'Phim đã được xoá');
-    return payload;
-  }
-
-  async themPhimUploadHinh() {
-    return;
   }
   async capNhatPhimUpload() {
     return;
+  }
+  async xoaPhim(maPhim: number): Promise<any> {
+    //   const checkMaPhim = await this.prisma.phim.findFirst({
+    //     where: {
+    //       ma_phim: maPhim,
+    //     },
+    //   });
+    //   if (!checkMaPhim) {
+    //     return createResponse(
+    //       400,
+    //       'Không tìm thấy tài nguyên',
+    //       'Mã phim không tồn tại',
+    //     );
+    //   }
+    //   await this.prisma.phim.delete({
+    //     where: {
+    //       ma_phim: maPhim,
+    //     },
+    //   });
+    //   const payload = createResponse(200, 'Xử lý thành công', 'Phim đã được xoá');
+    //   return payload;
+    return maPhim;
   }
 
   async layThongTinPhim(maPhim: number): Promise<Phim | null> {

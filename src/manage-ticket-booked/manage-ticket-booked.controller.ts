@@ -10,12 +10,13 @@ import {
 import { ManageTicketBookedService } from './manage-ticket-booked.service';
 import { CreateShowtimeDto } from './dto/create-showtime.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ApiBearerAuth, ApiProperty, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { authorize } from 'passport';
 import { DanhSachVeDat } from './dto/danh-sach-ve-dat.dto';
 
-@ApiTags('ManageTicketBooked')
-@Controller('api/manage-ticket-booked')
+@ApiTags('QuanLyDatVe')
+@Controller('api/QuanLyDatVe')
 export class ManageTicketBookedController {
   constructor(
     private readonly manageTicketBookedService: ManageTicketBookedService,
@@ -26,14 +27,14 @@ export class ManageTicketBookedController {
     return await this.manageTicketBookedService.datVe(datVe);
   }
 
-  @Get('get-list-ticket-room')
+  @Get('LayDanhSachPhongVe')
   getListRoom(@Query('showtimeId') showtimeId: string) {
     return this.manageTicketBookedService.getListRoom(+showtimeId);
   }
 
   // @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Post('create-showtime')
+  @Post('TaoLichChieu')
   createShowtime(@Body() createShowtime: CreateShowtimeDto) {
     return this.manageTicketBookedService.createShowtime(createShowtime);
   }

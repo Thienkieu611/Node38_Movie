@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UserLoginDto } from './dto/login.dto';
+import { createResponse } from 'src/utils/config';
 
 @Injectable()
 export class AuthService {
@@ -66,10 +67,16 @@ export class AuthService {
             so_dt: createUserDto.phone,
           },
         });
-        return createUser;
+        const payload = createResponse(200, 'Xử lý thành công', createUser);
+        return payload;
       }
     } catch (error) {
-      return error;
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error,
+      );
+      return errorPayload;
     }
   }
 }

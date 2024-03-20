@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { CreateShowtimeDto } from './dto/create-showtime.dto';
+import { createResponse } from 'src/utils/config';
 
 @Injectable()
 export class ManageTicketBookedService {
@@ -17,9 +18,15 @@ export class ManageTicketBookedService {
           Phim: true,
         },
       });
-      return listTicketRoom;
+      const payload = createResponse(200, 'Xử lý thành công', listTicketRoom);
+      return payload;
     } catch (error) {
-      return error;
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error,
+      );
+      return errorPayload;
     }
   }
 
@@ -33,9 +40,15 @@ export class ManageTicketBookedService {
           gia_ve: createShowtime.ticketPrice,
         },
       });
-      return showtime;
+      const payload = createResponse(200, 'Xử lý thành công', showtime);
+      return payload;
     } catch (error) {
-      return error;
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error,
+      );
+      return errorPayload;
     }
   }
 }

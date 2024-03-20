@@ -1,23 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { NguoiDung, PrismaClient } from '@prisma/client';
+import { createResponse } from 'src/utils/config';
 
 @Injectable()
 export class UserService {
   prisma = new PrismaClient();
 
   findAll() {
-    const data = [
-      {
-        maLoaiNguoiDung: 'admin',
-        tenLoai: 'admin',
-      },
-      {
-        maLoaiNguoiDung: 'users',
-        tenLoai: 'users',
-      },
-    ];
-    return data;
+    try {
+      const data = [
+        {
+          maLoaiNguoiDung: 'admin',
+          tenLoai: 'admin',
+        },
+        {
+          maLoaiNguoiDung: 'users',
+          tenLoai: 'users',
+        },
+      ];
+      const payload = createResponse(200, 'Xử lý thành công', data);
+      return payload;
+    } catch (error) {
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error,
+      );
+      return errorPayload;
+    }
   }
 
   async findOne(id: number): Promise<NguoiDung> {
@@ -27,9 +38,15 @@ export class UserService {
           tai_khoan: id,
         },
       });
-      return user;
+      const payload = createResponse(200, 'Xử lý thành công', user);
+      return payload;
     } catch (error) {
-      return error;
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error,
+      );
+      return errorPayload;
     }
   }
 
@@ -55,10 +72,16 @@ export class UserService {
             so_dt: updateUserDto.phone,
           },
         });
-        return createUser;
+        const payload = createResponse(200, 'Xử lý thành công', createUser);
+        return payload;
       }
     } catch (error) {
-      return error;
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error,
+      );
+      return errorPayload;
     }
   }
 
@@ -69,18 +92,30 @@ export class UserService {
           tai_khoan: id,
         },
       });
-      return deleteUser;
+      const payload = createResponse(200, 'Xử lý thành công', deleteUser);
+      return payload;
     } catch (error) {
-      return error;
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error,
+      );
+      return errorPayload;
     }
   }
 
   async getAllUser(): Promise<any> {
     try {
       const user = await this.prisma.nguoiDung.findMany();
-      return user;
+      const payload = createResponse(200, 'Xử lý thành công', user);
+      return payload;
     } catch (error) {
-      return error;
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error,
+      );
+      return errorPayload;
     }
   }
 
@@ -93,9 +128,15 @@ export class UserService {
           },
         },
       });
-      return user;
+      const payload = createResponse(200, 'Xử lý thành công', user);
+      return payload;
     } catch (error) {
-      return error;
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error,
+      );
+      return errorPayload;
     }
   }
 
@@ -106,9 +147,15 @@ export class UserService {
           tai_khoan: id,
         },
       });
-      return user;
+      const payload = createResponse(200, 'Xử lý thành công', user);
+      return payload;
     } catch (error) {
-      return error;
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error,
+      );
+      return errorPayload;
     }
   }
 }

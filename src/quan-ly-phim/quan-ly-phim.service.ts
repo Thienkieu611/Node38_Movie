@@ -119,6 +119,11 @@ export class QuanLyPhimService {
     }
   }
 
+  async quanLyPhim(file): Promise<any> {
+    try {
+    } catch (error) {}
+  }
+
   async layThongTinPhim(maPhim: number): Promise<Phim | null> {
     try {
       const thongTinPhim = await this.prisma.phim.findFirst({

@@ -7,14 +7,26 @@ import {
   Param,
   Delete,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { QuanLyPhimService } from './quan-ly-phim.service';
 import { CreateQuanLyPhimDto } from './dto/create-quan-ly-phim.dto';
 import { UpdateQuanLyPhimDto } from './dto/update-quan-ly-phim.dto';
-import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiExcludeEndpoint,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Banner, Phim } from '@prisma/client';
 import { SearchFilmDto } from './dto/search-phim.dto';
 import { createResponse } from 'src/utils/config';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @ApiTags('QuanLyPhim')
 @Controller('api/QuanLyPhim')
@@ -112,6 +124,43 @@ export class QuanLyPhimController {
       tuNgay,
       denNgay,
     );
+  }
+
+  @Post('QuanLyPhim')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: process.cwd() + '/public/img',
+        filename: (req, file, callback) => {
+          callback(null, new Date().getTime + `${file.originalname}`);
+        },
+      }),
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Dữ liệu của file',
+    required: true,
+
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'File to upload',
+        },
+        tenPhim: {
+          type: 'string',
+          description: 'Tên phim',
+        },
+      },
+    },
+  })
+  async quanLyPhim(
+    @UploadedFile('file') file: Express.Multer.File,
+  ): Promise<any> {
+    return await this.quanLyPhimService.quanLyPhim(file);
   }
 
   @Get('LayThongTinPhim')

@@ -136,6 +136,8 @@ export class QuanLyPhimController {
     );
   }
 
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Post('QuanLyPhim')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -168,43 +170,23 @@ export class QuanLyPhimController {
     },
   })
   async quanLyPhim(
+    @Req() req: Request,
     @UploadedFile('file') file: Express.Multer.File,
     @Body('tenPhim') tenPhim: string,
   ): Promise<any> {
+    const authorizationToken = (req.headers as any).authorization;
+    const token = authorizationToken.split('Bearer ')[1];
+    const userInfo = await decodedToken(token);
+    if (userInfo.role !== 'admin') {
+      return createResponse(
+        400,
+        'Unauthorized',
+        'Chỉ có admin mới có thể quản lý phim !',
+      );
+    }
     return await this.quanLyPhimService.quanLyPhim(file, tenPhim);
   }
 
-  // @Post('ThemPhimUploadHinh')
-  // @UseInterceptors(
-  //   FileInterceptor('file', {
-  //     storage: diskStorage({
-  //       destination: process.cwd() + '/public/img',
-  //       filename: (req, file, callback) => {
-  //         callback(null, new Date().getTime() + `${file.originalname}`);
-  //       },
-  //     }),
-  //   }),
-  // )
-  // @ApiConsumes('multipart/form-data')
-  // @ApiBody({
-  //   description: 'Dữ liệu của file',
-  //   required: true,
-  //   schema: {
-  //     type: 'object',
-
-  //     properties: {
-  //       file: {
-  //         type: 'string',
-  //         format: 'binary',
-  //         description: 'File to upload',
-  //       },
-  //       maPhim: {
-  //         type: 'number',
-  //         description: 'Mã phim',
-  //       },
-  //     },
-  //   },
-  // })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @Put('CapNhatPhimUpload')

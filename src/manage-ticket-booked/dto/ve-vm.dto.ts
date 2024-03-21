@@ -5,5 +5,5 @@ export class VeVM {
   maGhe: number;
 
   @ApiProperty()
-  giaVe: number;
+  taiKhoan: number;
 }

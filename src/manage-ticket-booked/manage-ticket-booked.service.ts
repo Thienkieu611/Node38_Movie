@@ -3,31 +3,39 @@ import { PrismaClient } from '@prisma/client';
 import { CreateShowtimeDto } from './dto/create-showtime.dto';
 import { createResponse } from 'src/utils/config';
 import { DanhSachVeDat } from './dto/danh-sach-ve-dat.dto';
+import { PrismaClientValidationError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class ManageTicketBookedService {
   prisma = new PrismaClient();
 
-  async datVe(datVe: DanhSachVeDat): Promise<any> {
+  async datVe(datVe: DanhSachVeDat): Promise<DanhSachVeDat> {
     const { maLichChieu, danhSachVe } = datVe;
     try {
-      // const lichChieu = await this.prisma.lichChieu.findUnique({
-      //   where: { ma_lich_chieu: maLichChieu },
-      // });
-      // if (!lichChieu) {
-      //   throw new Error('Không tìm thấy lịch chiếu');
-      // }
-      // const promises = danhSachVe.map(async (ve) => {
-      //   const { maGhe, giaVe } = ve;
-      //   await this.prisma.datVe.create({
-      //     data: {
-      //       ma_lich_chieu: maLichChieu,
-      //       ma_ghe: maGhe,
-      //       gia,
-      //     },
-      //   });
-      // });
-    } catch (error) {}
+      const promises = danhSachVe.map(async (ve) => {
+        const bookTicket = await this.prisma.datVe.create({
+          data: {
+            ma_lich_chieu: maLichChieu,
+
+            ma_ghe: ve.maGhe,
+            tai_khoan: ve.taiKhoan,
+          },
+        });
+        return bookTicket;
+      });
+
+      const bookedTickets = await Promise.all(promises);
+
+      const payload = createResponse(200, 'Đặt vé thành công', bookedTickets);
+      return payload;
+    } catch (error) {
+      const errorPayload = createResponse(
+        500,
+        'Đã xảy ra lỗi khi xử lý yêu cầu',
+        error.message,
+      );
+      return errorPayload;
+    }
   }
 
   async getListRoom(showtimeId: number): Promise<any> {

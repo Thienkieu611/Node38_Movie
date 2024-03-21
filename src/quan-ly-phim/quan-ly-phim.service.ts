@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CreateQuanLyPhimDto } from './dto/create-quan-ly-phim.dto';
-import { UpdateQuanLyPhimDto } from './dto/update-quan-ly-phim.dto';
+
 import { Banner, Phim, PrismaClient } from '@prisma/client';
 import { createResponse } from 'src/utils/config';
 import { SearchFilmDto } from './dto/search-phim.dto';
-import { contains } from 'class-validator';
+
 import { UpdatePhimDto } from './dto/update-phim.dto';
 
 @Injectable()

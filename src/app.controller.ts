@@ -12,6 +12,6 @@ export class AppController {
 
   @Get()
   getManageUser() {
-    return ('test success')
+    return 'test success';
   }
 }

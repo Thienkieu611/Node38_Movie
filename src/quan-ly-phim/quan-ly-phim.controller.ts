@@ -3,31 +3,21 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
   Delete,
   Query,
   UseInterceptors,
   UploadedFile,
-  Headers,
   UseGuards,
-  Header,
   Put,
   Req,
 } from '@nestjs/common';
 import { QuanLyPhimService } from './quan-ly-phim.service';
-import { CreateQuanLyPhimDto } from './dto/create-quan-ly-phim.dto';
-import { UpdateQuanLyPhimDto } from './dto/update-quan-ly-phim.dto';
+
 import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
-  ApiExcludeEndpoint,
-  ApiHeader,
-  ApiHeaders,
-  ApiParam,
   ApiQuery,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { Banner, Phim } from '@prisma/client';
